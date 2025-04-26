@@ -1,0 +1,19 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="60" rx="12" fill="#0D1117"></rect>
+  
+  <!-- Texto "Cell" -->
+  <text x="20" y="38" font-family="Arial, sans-serif" font-size="28" fill="#00D8FF" font-weight="bold">Cell</text>
+  
+  <!-- Texto "Shop" -->
+  <text x="85" y="38" font-family="Arial, sans-serif" font-size="28" fill="#FFFFFF" font-weight="bold">Shop</text>
+  
+  <!-- Ícono de celular estilizado -->
+  <g>
+    <!-- Celular externo -->
+    <rect x="155" y="14" width="25" height="32" rx="4" fill="#00D8FF"></rect>
+    <!-- Pantalla interna -->
+    <rect x="158" y="18" width="19" height="24" rx="2" fill="#0D1117"></rect>
+    <!-- Notch superior -->
+    <rect x="165" y="18" width="5" height="3" rx="1" fill="#00D8FF"></rect>
+  </g>
+</svg>
