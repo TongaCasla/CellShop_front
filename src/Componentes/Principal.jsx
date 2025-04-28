@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 
  const Principal = () => {
   return (
@@ -27,7 +27,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
             <p className="lead">Esta es otra característica de tu producto. Puedes agregar más información sobre lo que la hace especial.</p>
           </Col>
           <Col md={6} order={{ md: 1 }}>
-            <img src="" alt="Feature 2" className="featurette-image img-fluid" />
+            <img src="/img/cell.png" alt="Feature 2" className="featurette-image img-fluid" />
           </Col>
         </Row>
         <hr className="featurette-divider" />
