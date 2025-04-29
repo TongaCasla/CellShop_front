@@ -11,16 +11,21 @@ const NavB = () => {
         <BsNavbar  bg="dark" data-bs-theme="dark">
         <Container>
             <BsNavbar.Brand href="/">
-            <img alt='' src="/logoCS.svg" width="100" height="70"/>
+            <img alt='' src="/logoCS.svg" width="150"height="110"></img>
             </BsNavbar.Brand>
             <BsNavbar.Toggle aria-controls="navbar-nav" />
-            <BsNavbar.Collapse id="basic-navbar-nav">
-              <Nav className="me-auto"> 
-                <Nav.Link href="/Productos">Productos</Nav.Link>
-                <Nav.Link href="/ProductosCRUD">CRUD Productos</Nav.Link>
-                <Nav.Link href="/Registro">Registro</Nav.Link>
-                <Nav.Link href="/Ingreso">Ingreso</Nav.Link>
-              </Nav>
+            <BsNavbar.Collapse id="basic-navbar-nav">             
+
+            <Nav className="me-auto nav nav-underline dark" class="nav nav-underline mx-auto">
+              <Nav.Link href="/Productos">Productos</Nav.Link>
+              <Nav.Link href="/ProductosCRUD">CRUD Productos</Nav.Link>
+            </Nav>
+            
+            <Nav className="ms-auto nav nav-pills nav-fill dark" class="nav nav-pills nav-fill">
+              <Nav.Link class="nav-link " href="/Registro">Registro</Nav.Link>             
+              <Nav.Link class="nav-item nav-link active" aria-current="page" href="/Ingreso">Ingreso</Nav.Link>
+            </Nav>
+              
             </BsNavbar.Collapse>
         </Container>
         </BsNavbar>
