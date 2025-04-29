@@ -2,22 +2,123 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Spinner } from 'react-bootstrap';
 import axios from 'axios';
-import { ApiProducto } from '../Utilidades/api';
+import { ApiAgregarPres, ApiCategoria, ApiProducto, ApiTipoProducto } from '../Utilidades/api';
 
 const ProductosCRUD = () => {
+  
   const [productos, setProductos] = useState([]);
+  const [tipoproductos, setTipoProductos] = useState([]);
+  const [categoria, setCategoria] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [nuevoProducto, setNuevoProducto] = useState({
+  const [formTipo, setFormTipo] = useState("");
+  const [nuevaPres, setNuevaPres] = useState({
 
-    nombre: '',
+    
+    nombre_presentacion: '',
     descripcion: '',
-    precio: '',
-    precioVenta: '',
     stock: '',
-    imagen: ''
+    precio_compra: '',
+    porcentaje_aumento: '',
+    id_producto: '', 
+  });
+  
+ 
+  const [nuevoProducto, setNuevoProducto] = useState({
+    nombre_producto: '',
+    id_categoria: '',
+    estado_producto: 'activo'
   });
 
+  const [formData, setFormData] = useState({
+    producto: { nombre: "" },
+    presentacion: { nombre: "" },
+    modificar: { nombre: "" }
+  });
+  const handleChangeProducto = (e) => {
+    const { name, value } = e.target;
+    setNuevoProducto((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  const handleChangePres = (e) => {
+    const { name, value } = e.target;
+    setNuevaPres((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  const handleModificar = (producto) => {
+    setNuevaPres({
+      nombre_presentacion: producto.nombre_presentacion,
+      descripcion: producto.descripcion,
+      stock: producto.stock,
+      precio_compra: producto.precio_compra,
+      porcentaje_aumento: producto.porcentaje_aumento,
+      id_producto: producto.producto.id_producto,
+      id_presentacion: producto.id_presentacion,
+    });
+    setFormTipo("modificar");
+    setShowModal(true);
+  };
+  const handleClose = () => setShowModal(false);
+
+  const agregarPresentacion = async () => {
+    try {
+      const response = await axios.post(`${ApiAgregarPres}${nuevaPres.id_producto}/presentacion`, nuevaPres);
+      
+      setNuevaPres({
+        nombre_presentacion: '',
+        descripcion: '',
+        stock: '',
+        precio_compra: '',
+        porcentaje_aumento: '',
+        id_producto: '',
+        
+      }); 
+      await fetchProductos();
+      handleClose();
+    } catch (error) {
+      console.error('Error al agregar producto:', error);
+    }
+  };
+  const modificarPresentacion = async (id_presentacion,id_producto) => {
+    try {
+      const response = await axios.put(`${ApiAgregarPres}${id_producto}/presentacion/${id_presentacion}`,nuevaPres);
+      
+      setNuevaPres({
+        id_presentacion: '',
+        nombre_presentacion: '',
+        descripcion: '',
+        stock: '',
+        precio_compra: '',
+        porcentaje_aumento: '',
+        id_producto: ''
+        
+      });  
+      await fetchProductos();
+      handleClose();
+    } catch (error) {
+      console.error('Error al agregar producto:', error);
+    }
+  };
+  const agregarProducto = async () => {
+    try {
+      const response = await axios.post(ApiTipoProducto,nuevoProducto);
+      await fetchProductos();
+      await fetchTipoProductos();
+      setNuevoProducto({
+        nombre_producto: '',
+        id_categoria: '',
+        estado_producto: 'activo'
+        
+      }); 
+      handleClose();
+    } catch (error) {
+      console.error('Error al agregar producto:', error);
+    }
+  };
   // Función para obtener productos desde la API
   const fetchProductos = async () => {
     try {
@@ -29,40 +130,255 @@ const ProductosCRUD = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchProductos(); // Se ejecuta una sola vez cuando carga el componente
-  }, []);
-
-  const handleShow = () => setShowModal(true);
-  const handleClose = () => setShowModal(false);
-
-  const handleChange = (e) => {
-    setNuevoProducto({ ...nuevoProducto, [e.target.name]: e.target.value });
-  };
-
-  const agregarProducto = async () => {
+  const fetchTipoProductos = async () => {
     try {
-      const response = await axios.post(ApiProducto, nuevoProducto);
-      setProductos([...productos, response.data]);
-      setNuevoProducto({
-        nombre: '',
-        descripcion: '',
-        precio: '',
-        precioVenta: '',
-        stock: '',
-        imagen: ''
-      });
-      handleClose();
+      const response = await axios.get(ApiTipoProducto); // ← Cambia esta URL
+      setTipoProductos(response.data);
+      setLoading(false);
     } catch (error) {
-      console.error('Error al agregar producto:', error);
+      console.error('Error al obtener productos:', error);
+      setLoading(false);
+    }
+  };
+  const fetchCategoria = async () => {
+    try {
+      const response = await axios.get(ApiCategoria); // ← Cambia esta URL
+      setCategoria(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error al obtener productos:', error);
+      setLoading(false);
     }
   };
 
-  const eliminarProducto = async (id) => {
+  useEffect(() => { // Se ejecuta una sola vez cuando carga el componente
+    fetchProductos();
+    fetchTipoProductos();
+    fetchCategoria();
+  }, []);
+
+  const forms = {
+    producto: {
+      title: "Agregar Producto",
+      content: (
+        <Form>
+            <Form.Group>
+              <Form.Label>Categoria</Form.Label>
+              <Form.Control
+                as="select"
+                name="id_categoria"
+                value={nuevoProducto.id_categoria}
+                onChange={handleChangeProducto}
+              >
+                <option value="">Seleccione un tipo</option>
+                {categoria.map((cat) => (
+                  <option key={cat.id_categoria} value={cat.id_categoria}>
+                    {cat.nombre_categoria}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group> 
+            <Form.Group>
+              <Form.Label>Nombre</Form.Label>
+              <Form.Control
+                type="text"
+                name="nombre_producto"
+                value={nuevoProducto.nombre_producto}
+                onChange={handleChangeProducto}
+              />
+            </Form.Group>
+            <Form.Group>
+                <Button variant="secondary" className='mr-3' onClick={handleClose}>
+                Cancelar
+                </Button>
+                <Button variant="primary"  className='m-3' onClick={agregarProducto}>
+                Agregar
+               </Button>
+          </Form.Group>
+          </Form>
+      ),
+    },
+    presentacion: {
+      title: "Agregar Presentación",
+      content: (
+        <Form>
+           <Form.Group>
+              <Form.Label>Tipo de producto</Form.Label>
+              <Form.Control
+                as="select"
+                name="id_producto"
+                value={nuevaPres.id_producto}
+                onChange={handleChangePres}
+              >
+                <option value="">Seleccione un tipo</option>
+                {tipoproductos.map((tipo) => (
+                  <option key={tipo.id_producto} value={tipo.id_producto}>
+                    {tipo.nombre_producto} 
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Nombre</Form.Label>
+              <Form.Control
+                type="text"
+                name="nombre_presentacion"
+                value={nuevaPres.nombre_presentacion}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Descripción</Form.Label>
+              <Form.Control
+                type="text"
+                name="descripcion"
+                value={nuevaPres.descripcion}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Precio</Form.Label>
+              <Form.Control
+                type="number"
+                name="precio_compra"
+                value={nuevaPres.precio_compra}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Porcentaje de aumento</Form.Label>
+              <Form.Control
+                type="number"
+                name="porcentaje_aumento"
+                value={nuevaPres.porcentaje_aumento}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Stock</Form.Label>
+              <Form.Control
+                type="number"
+                name="stock"
+                value={nuevaPres.stock}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+                <Button variant="secondary" className='mr-3' onClick={handleClose}>
+                Cancelar
+                </Button>
+                <Button variant="primary" className='m-3' onClick={agregarPresentacion}>
+                Agregar
+               </Button>
+          </Form.Group>
+          </Form>
+      ),
+    },
+    modificar: {
+      title: "Modificar Presentación",
+      content: (
+        <Form>
+           <Form.Group>
+              <Form.Label>Tipo de producto</Form.Label>
+              <Form.Control
+                as="select"
+                name="id_producto"
+                value= {nuevaPres.id_producto}
+                onChange={handleChangePres}
+                disabled
+              >
+                <option value="">Seleccione un tipo</option>
+                {tipoproductos.map((tipo) => (
+                  <option key={tipo.id_producto} value={tipo.id_producto}>
+                    {tipo.nombre_producto} 
+                  </option>
+                ))} 
+              </Form.Control>
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Nombre</Form.Label>
+              <Form.Control
+                type="text"
+                name="nombre_presentacion"
+                value={nuevaPres.nombre_presentacion}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Descripción</Form.Label>
+              <Form.Control
+                type="text"
+                name="descripcion"
+                value={nuevaPres.descripcion}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Precio</Form.Label>
+              <Form.Control
+                type="number"
+                name="precio_compra"
+                value={nuevaPres.precio_compra}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Porcentaje de aumento</Form.Label>
+              <Form.Control
+                type="number"
+                name="porcentaje_aumento"
+                value={nuevaPres.porcentaje_aumento}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Stock</Form.Label>
+              <Form.Control
+                type="number"
+                name="stock"
+                value={nuevaPres.stock}
+                onChange={handleChangePres}
+              />
+            </Form.Group>
+            <Form.Group>
+                <Button variant="secondary" className='mr-3' onClick={handleClose}>
+                Cancelar
+                </Button>
+                <Button variant="primary" className='m-3' onClick={() => modificarPresentacion(nuevaPres.id_presentacion, nuevaPres.id_producto)}>
+                Agregar
+               </Button>
+          </Form.Group>
+          </Form>
+      ),
+    },
+  };
+  
+  const handleShow = (tipo) => {
+    setFormTipo(tipo);
+    setShowModal(true);
+    
+    if (tipo === "presentacion") {
+      setNuevaPres({
+        
+        nombre_presentacion: '',
+        descripcion: '',
+        stock: '',
+        precio_compra: '',
+        porcentaje_aumento: '',
+        id_producto: ''
+      });
+    } 
+  };
+
+  
+
+
+
+
+  const eliminarPresentacion = async (id_presentacion,id_producto) => {
     try {
-      await axios.delete(`${ApiProducto}/${id}`);
-      setProductos(productos.filter(producto => producto.id !== id));
+      await axios.delete(`${ApiAgregarPres}${id_producto}/presentacion/${id_presentacion}`);
+      await fetchProductos();
     } catch (error) {
       console.error('Error al eliminar producto:', error);
     }
@@ -71,9 +387,13 @@ const ProductosCRUD = () => {
   return (
     <div className="container mt-5">
       <h2>Lista de Productos</h2>
-      <Button variant="primary" onClick={handleShow} className="mb-3">
+      <Button variant="primary"  onClick={() => handleShow("producto")} className="m-3">
         Agregar Producto
       </Button>
+      <Button variant="primary" onClick={() => handleShow("presentacion")} className="m-3">
+        Agregar Presentacion
+      </Button>
+
 
       {loading ? (
         <div className="text-center">
@@ -86,7 +406,6 @@ const ProductosCRUD = () => {
             <tr>
               <th>ID</th>
               <th>Producto</th>
-              <th>Marca</th>
               <th>Precio</th>
               <th>Precio Venta</th>
               <th>Stock</th>
@@ -98,18 +417,18 @@ const ProductosCRUD = () => {
             {productos.map((producto, index) => (
               <tr key={producto.id_presentacion}>
                 <td>{producto.id_presentacion}</td>
-                <td>{producto.nombre_presentacion}</td>
-                <td>{producto.producto.nombre_producto}</td>
-                <td>{producto.precio}</td> 
-                <td>{producto.precioVenta}</td>
+                <td>{producto.producto.nombre_producto} {producto.nombre_presentacion}</td>
+                <td> $ {producto.precio_compra}</td> 
+                <td> $ {producto.precio_compra *(1+producto.porcentaje_aumento/100)}</td>
                 <td>{producto.stock}</td> 
                 <td>
-                  {producto.imagen ? (
-                    <img src={producto.imagen} alt="Producto" width="50" height="50" />
-                  ) : 'Sin imagen'}
+                  <img src={`/img/${producto.nombre_presentacion}.webp`}  alt="Producto" width="50" height="50" />
                 </td>
                 <td>
-                  <Button variant="danger" onClick={() => eliminarProducto(producto.id)}>
+                  <Button variant="success" className='m-1' onClick={() => handleModificar(producto)}>
+                    Modificar
+                  </Button>
+                  <Button variant="danger" onClick={() => eliminarPresentacion(producto.id_presentacion, producto.producto.id_producto)}>
                     Eliminar
                   </Button>
                 </td>
@@ -119,78 +438,19 @@ const ProductosCRUD = () => {
         </Table>
       )}
 
-      {/* Modal para agregar producto */}
+    
+
+      {/* Modal para agregar presentacion */}
+
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Agregar Producto</Modal.Title>
+          <Modal.Title>{forms[formTipo]?.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>Nombre</Form.Label>
-              <Form.Control
-                type="text"
-                name="nombre"
-                value={nuevoProducto.nombre}
-                onChange={handleChange}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Descripción</Form.Label>
-              <Form.Control
-                type="text"
-                name="descripcion"
-                value={nuevoProducto.descripcion}
-                onChange={handleChange}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Precio</Form.Label>
-              <Form.Control
-                type="number"
-                name="precio"
-                value={nuevoProducto.precio}
-                onChange={handleChange}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Precio Venta</Form.Label>
-              <Form.Control
-                type="number"
-                name="precioVenta"
-                value={nuevoProducto.precioVenta}
-                onChange={handleChange}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Stock</Form.Label>
-              <Form.Control
-                type="number"
-                name="stock"
-                value={nuevoProducto.stock}
-                onChange={handleChange}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>URL de Imagen</Form.Label>
-              <Form.Control
-                type="text"
-                name="imagen"
-                value={nuevoProducto.imagen}
-                onChange={handleChange}
-              />
-            </Form.Group>
-          </Form>
+          {forms[formTipo]?.content}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={agregarProducto}>
-            Agregar
-          </Button>
-        </Modal.Footer>
       </Modal>
+      
     </div>
   );
 };
