@@ -9,7 +9,8 @@ import NavB from './Componentes/Navb';
 import Registro  from './Componentes/Registro';
 import Login from './Componentes/Login';
 import ProductosCRUD from './Componentes/ProductosCRUD ';
-import Carrito from './Componentes/Carrito';
+import Cart from './Componentes/Cart';
+import { CartProvider } from './Componentes/CartContext';
 
 
 
@@ -17,7 +18,7 @@ import Carrito from './Componentes/Carrito';
 
 function App() {
   return (
-    
+    <CartProvider>
     <div className='App'>
         
         <NavB/>
@@ -27,7 +28,7 @@ function App() {
             <Route path="/" exact component={Principal} />
             <Route path="/Productos" component={Productos} />
             <Route path="/ProductosCRUD" component={ProductosCRUD} />
-             <Route path="/Carrito" component={Carrito} />
+             <Route path="/Carrito" component={Cart} />
             <Route path="/Registro" component={Registro} />
             <Route path="/Ingreso" component={Login} />
           </Switch>
@@ -37,7 +38,7 @@ function App() {
 
        
     </div>
-   
+    </CartProvider>
   );
 }
 

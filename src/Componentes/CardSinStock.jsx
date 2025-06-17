@@ -12,10 +12,11 @@ const CardSinStock = ({ producto }) => {
         <Card.Text>{producto.descripcion}</Card.Text>
         <Card.Text>
           <strong>SIN STOCK</strong>
+          <br></br>
+          <br></br>
+          <br></br>
+          
         </Card.Text>
-       { <Button   /*as={Link} to={''} */ variant="primary">
-          Ver detalles
-        </Button> }
       </Card.Body>
     </Card>
   )
