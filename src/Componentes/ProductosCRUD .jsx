@@ -345,7 +345,7 @@ const ProductosCRUD = () => {
                 Cancelar
                 </Button>
                 <Button variant="primary" className='m-3' onClick={() => modificarPresentacion(nuevaPres.id_presentacion, nuevaPres.id_producto)}>
-                Agregar
+                Modificar
                </Button>
           </Form.Group>
           </Form>
@@ -379,6 +379,7 @@ const ProductosCRUD = () => {
     try {
       await axios.delete(`${ApiAgregarPres}${id_producto}/presentacion/${id_presentacion}`);
       await fetchProductos();
+      handleClose();
     } catch (error) {
       console.error('Error al eliminar producto:', error);
     }
@@ -428,7 +429,7 @@ const ProductosCRUD = () => {
                   <Button variant="success" className='m-1' onClick={() => handleModificar(producto)}>
                     Modificar
                   </Button>
-                  <Button variant="danger" onClick={() => eliminarPresentacion(producto.id_presentacion, producto.producto.id_producto)}>
+                  <Button variant="danger" onClick={() => eliminarPresentacion(producto.id_presentacion,producto.producto.id_producto)}>
                     Eliminar
                   </Button>
                 </td>

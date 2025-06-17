@@ -19,6 +19,7 @@ const NavB = () => {
             <Nav className="me-auto nav nav-underline dark" class="nav nav-underline mx-auto">
               <Nav.Link href="/Productos">Productos</Nav.Link>
               <Nav.Link href="/ProductosCRUD">CRUD Productos</Nav.Link>
+              <Nav.Link href="/Carrito">Carrito</Nav.Link>
             </Nav>
             
             <Nav className="ms-auto nav nav-pills nav-fill dark" class="nav nav-pills nav-fill">

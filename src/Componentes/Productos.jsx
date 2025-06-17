@@ -1,6 +1,7 @@
 import React from 'react'
 import { Row, Col, Container } from 'react-bootstrap';
 import CardProducto  from './CardProducto';
+import CardSinStock from './CardSinStock';
 import axios from 'axios';
 import { ApiProducto } from '../Utilidades/api';
 import { useState, useEffect } from 'react';
@@ -27,8 +28,12 @@ const Productos = () => {
         <Row>
           {productos.map(producto => (
             <Col key={producto.id_presentacion} md={3}> 
+              {producto.stock > 0 ? (
               <CardProducto producto={producto} />
-            </Col>
+              ) : (
+              <CardSinStock producto={producto} />
+            )}
+            </Col> 
           ))}
         </Row>
       </Container>

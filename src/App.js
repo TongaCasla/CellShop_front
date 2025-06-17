@@ -9,31 +9,35 @@ import NavB from './Componentes/Navb';
 import Registro  from './Componentes/Registro';
 import Login from './Componentes/Login';
 import ProductosCRUD from './Componentes/ProductosCRUD ';
+import Carrito from './Componentes/Carrito';
+
 
 
 
 
 function App() {
   return (
+    
     <div className='App'>
         
         <NavB/>
       
         <Router>
-          <Switch>
-           
+          <Switch>   
             <Route path="/" exact component={Principal} />
             <Route path="/Productos" component={Productos} />
             <Route path="/ProductosCRUD" component={ProductosCRUD} />
+             <Route path="/Carrito" component={Carrito} />
             <Route path="/Registro" component={Registro} />
             <Route path="/Ingreso" component={Login} />
-            
-      
           </Switch>
         </Router>
 
         <Footer/>
+
+       
     </div>
+   
   );
 }
 
