@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Spinner } from 'react-bootstrap';
+import { Table, Button, Modal, Form, Spinner, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { ApiAgregarPres, ApiCategoria, ApiProducto, ApiTipoProducto } from '../Utilidades/api';
 
@@ -64,7 +64,15 @@ const ProductosCRUD = () => {
   };
   const handleClose = () => setShowModal(false);
 
+   const [errorMensaje, setErrorMensaje] = useState('');
+
   const agregarPresentacion = async () => {
+    const error = validarCamposPresentacion();
+     if (error) {
+    setErrorMensaje(error);
+    setTimeout(() => setErrorMensaje(''), 3000);
+    return;
+    }
     try {
       const response = await axios.post(`${ApiAgregarPres}${nuevaPres.id_producto}/presentacion`, nuevaPres);
       
@@ -75,15 +83,26 @@ const ProductosCRUD = () => {
         precio_compra: '',
         porcentaje_aumento: '',
         id_producto: '',
-        
       }); 
+      setErrorMensaje('');
       await fetchProductos();
       handleClose();
     } catch (error) {
       console.error('Error al agregar producto:', error);
+      setErrorMensaje(error.response.data.message);
+      setTimeout(() => {
+      setErrorMensaje('');
+      }, 3000);
+      
     }
   };
   const modificarPresentacion = async (id_presentacion,id_producto) => {
+    const error = validarCamposPresentacion();
+     if (error) {
+    setErrorMensaje(error);
+    setTimeout(() => setErrorMensaje(''), 3000);
+    return;
+    }
     try {
       const response = await axios.put(`${ApiAgregarPres}${id_producto}/presentacion/${id_presentacion}`,nuevaPres);
       
@@ -101,22 +120,42 @@ const ProductosCRUD = () => {
       handleClose();
     } catch (error) {
       console.error('Error al agregar producto:', error);
+      setErrorMensaje(error.response.data.message);
+      setTimeout(() => {
+      setErrorMensaje('');
+      }, 3000);
     }
   };
   const agregarProducto = async () => {
+    const error = validarCamposProducto();
+      if (error) {
+        setErrorMensaje(error);
+        setTimeout(() => setErrorMensaje(''), 3000);
+        return;
+    }
     try {
       const response = await axios.post(ApiTipoProducto,nuevoProducto);
-      await fetchProductos();
-      await fetchTipoProductos();
-      setNuevoProducto({
+      console.log(response);
+      if(response){
+         await fetchProductos();
+         await fetchTipoProductos();
+         setNuevoProducto({
         nombre_producto: '',
         id_categoria: '',
         estado_producto: 'activo'
-        
-      }); 
-      handleClose();
+          
+        }); 
+         handleClose();
+      }else{
+        return response;
+      }
+     
     } catch (error) {
       console.error('Error al agregar producto:', error);
+      setErrorMensaje(error.response.data.message);
+      setTimeout(() => {
+      setErrorMensaje('');
+      }, 3000);
     }
   };
   // Función para obtener productos desde la API
@@ -194,6 +233,7 @@ const ProductosCRUD = () => {
                 <Button variant="primary"  className='m-3' onClick={agregarProducto}>
                 Agregar
                </Button>
+               {errorMensaje && (<Alert variant="danger">{errorMensaje}</Alert>)}
           </Form.Group>
           </Form>
       ),
@@ -270,6 +310,7 @@ const ProductosCRUD = () => {
                 <Button variant="primary" className='m-3' onClick={agregarPresentacion}>
                 Agregar
                </Button>
+               {errorMensaje && (<Alert variant="danger">{errorMensaje}</Alert>)}
           </Form.Group>
           </Form>
       ),
@@ -347,6 +388,7 @@ const ProductosCRUD = () => {
                 <Button variant="primary" className='m-3' onClick={() => modificarPresentacion(nuevaPres.id_presentacion, nuevaPres.id_producto)}>
                 Modificar
                </Button>
+               {errorMensaje && (<Alert variant="danger">{errorMensaje}</Alert>)}
           </Form.Group>
           </Form>
       ),
@@ -370,11 +412,6 @@ const ProductosCRUD = () => {
     } 
   };
 
-  
-
-
-
-
   const eliminarPresentacion = async (id_presentacion,id_producto) => {
     try {
       await axios.delete(`${ApiAgregarPres}${id_producto}/presentacion/${id_presentacion}`);
@@ -383,6 +420,37 @@ const ProductosCRUD = () => {
     } catch (error) {
       console.error('Error al eliminar producto:', error);
     }
+  };
+
+  const validarCamposPresentacion = () => {
+    const camposObligatorios = [
+      'nombre_presentacion',
+      'descripcion',
+      'stock',
+      'precio_compra',
+      'porcentaje_aumento',
+      'id_producto'
+    ];
+
+    for (let campo of camposObligatorios) {
+      if (!nuevaPres[campo] || nuevaPres[campo].toString().trim() === "") {
+          return `El campo "${campo.replace('_', ' ')}" es obligatorio.`;
+      }
+    }
+
+    return null; // sin errores
+  };
+
+  const validarCamposProducto = () => {
+    const camposObligatorios = ['id_categoria', 'nombre_producto'];
+
+    for (let campo of camposObligatorios) {
+      if (!nuevoProducto[campo] || nuevoProducto[campo].toString().trim() === '') {
+        return `El campo "${campo.replace('_', ' ')}" es obligatorio.`;
+      }
+    }
+
+    return null;
   };
 
   return (
