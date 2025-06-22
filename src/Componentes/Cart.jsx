@@ -1,24 +1,36 @@
 import React from 'react';
 import { useCart } from './CartContext';
 import { Table, Button, Container, Form } from 'react-bootstrap';
+import { useEffect, useState, useContext } from 'react';
+import { ApiCarrito } from '../Utilidades/api';
+import axios from 'axios';
+import { AuthContext } from './AuthContext';
 
 const Cart = () => {
-  const { cart, removeFromCart, updateQuantity, getTotalPrice } = useCart();
+  const [carrito, setProductos] = useState([]);
+   const { usuarioData, setUsuarioData } = useContext(AuthContext);
 
-  // Calcular el total (usando la fórmula del precio con porcentaje_aumento)
-  const total = cart.reduce(
-    (sum, producto) =>
-      sum +
-      producto.precio_compra *
-        (1 + producto.porcentaje_aumento / 100) *
-        producto.quantity,
-    0
-  );
+  const fetchCarrito = async () => {
+    
+    try {
+     
+      const response = await axios.get(`${ApiCarrito}${usuarioData.id_usuario}`); // Cambia esta URL por la correcta de tu API
+      setProductos(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error al obtener productos:', error);
+    }
+  };
+
+
+   useEffect(() => {
+        fetchCarrito(); 
+      }, []);
 
   return (
     <div className="container mt-4">
       <h2>Carrito de compras</h2>
-      {cart.length === 0 ? (
+      {carrito.length === 0 ? (
         <p>El carrito está vacío.</p>
       ) : (
         <Table striped bordered hover>
@@ -32,34 +44,33 @@ const Cart = () => {
             </tr>
           </thead>
           <tbody>
-            {cart.map((producto) => (
-              <tr key={producto.id_presentacion}>
+            {carrito.map((producto) => (
+              <tr key={producto.detalles.presentacion.id_presentacion}>
                 <td>
-                  {producto.producto.nombre_producto}{' '}
-                  {producto.nombre_presentacion}
+                  {producto.detalles.presentacion.nombre_presentacion}
+                  
                 </td>
                 <td>
                   $
                   {(
-                    producto.precio_compra *
-                    (1 + producto.porcentaje_aumento / 100)
-                  ).toFixed(2)}
+                    producto.detalles.precio_unitario
+                    
+                  )}
                 </td>
                 <td>
-                  {producto.quantity}
+                  {producto.detalles.cantidad}
                 </td>
                 <td>
                   $
                   {(
-                    producto.precio_compra *
-                    (1 + producto.porcentaje_aumento / 100) *
-                    producto.quantity
-                  ).toFixed(2)}
+                    producto.detalles.precio_unitario * producto.detalles.cantidad
+                    
+                  )}
                 </td>
                 <td>
                   <Button
                     variant="danger"
-                    onClick={() => removeFromCart(producto.id_presentacion)}
+                    //onClick={() => removeFromCart(producto.id_presentacion)}
                   >
                     Quitar
                   </Button>
@@ -69,7 +80,7 @@ const Cart = () => {
           </tbody>
         </Table>
       )}
-      <h4>Total: ${total.toFixed(2)}</h4>
+      <h4>Total: $ </h4>
     </div>
   );
 };

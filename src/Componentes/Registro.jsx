@@ -32,7 +32,7 @@ const Register = () => {
     setSuccess('');
 
     try {
-      const response = await axios.post(ApiUsuario, formData);
+      const response = await axios.post(`${ApiUsuario}registro`, formData);
       setSuccess(response.data.message || 'Usuario registrado exitosamente');
       setFormData({
         dni_usuario: '',

@@ -11,6 +11,7 @@ import Login from './Componentes/Login';
 import ProductosCRUD from './Componentes/ProductosCRUD ';
 import Cart from './Componentes/Cart';
 import { CartProvider } from './Componentes/CartContext';
+import { AuthProvider } from './Componentes/AuthContext';
 
 
 
@@ -18,6 +19,7 @@ import { CartProvider } from './Componentes/CartContext';
 
 function App() {
   return (
+    <AuthProvider>
     <CartProvider>
     <div className='App'>
         
@@ -26,11 +28,12 @@ function App() {
         <Router>
           <Switch>   
             <Route path="/" exact component={Principal} />
-            <Route path="/Productos" component={Productos} />
             <Route path="/ProductosCRUD" component={ProductosCRUD} />
-             <Route path="/Carrito" component={Cart} />
+            <Route path="/Productos" component={Productos} />
+            <Route path="/Carrito" component={Cart} />
             <Route path="/Registro" component={Registro} />
             <Route path="/Ingreso" component={Login} />
+         
           </Switch>
         </Router>
 
@@ -39,6 +42,7 @@ function App() {
        
     </div>
     </CartProvider>
+    </AuthProvider>
   );
 }
 

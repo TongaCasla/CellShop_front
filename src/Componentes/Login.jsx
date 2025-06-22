@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { ApiUsuario } from '../Utilidades/api';
+import { AuthContext } from './AuthContext';
 
 const Login = () => {
+  const { setUsuarioData } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     usuario: '',
     password: '',
@@ -24,6 +26,12 @@ const Login = () => {
 
     try {
       const response = await axios.post(`${ApiUsuario}login`, formData);
+      console.log('Respuesta del backend:', response.data);
+      setUsuarioData({
+      usuario: response.data.user.usuario,
+      id_rol: Number(response.data.user.id_rol),
+      id_usuario: response.data.user.id_usuario,
+      });
       setSuccess(response.data.message || 'Inicio de sesión exitoso');
      
       setFormData({ usuario: '', password: '' }); // Limpia el formulario
@@ -46,7 +54,7 @@ const Login = () => {
           <Form.Control
             type="text"
             name="usuario"
-            value={formData.username}
+            value={formData.usuario}
             onChange={handleChange}
             placeholder="Ingresa tu nombre de usuario"
             required
