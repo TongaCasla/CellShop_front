@@ -3,10 +3,11 @@ import { Form, Button, Container, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { ApiUsuario } from '../Utilidades/api';
+import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from './AuthContext';
 
 const Login = () => {
-  const { setUsuarioData } = useContext(AuthContext);
+  
   const [formData, setFormData] = useState({
     usuario: '',
     password: '',
@@ -27,17 +28,19 @@ const Login = () => {
     try {
       const response = await axios.post(`${ApiUsuario}login`, formData);
       console.log('Respuesta del backend:', response.data);
-      setUsuarioData({
-      usuario: response.data.user.usuario,
-      id_rol: Number(response.data.user.id_rol),
-      id_usuario: response.data.user.id_usuario,
-      });
+       // Si la autenticación es exitosa, el backend debería devolver un token JWT
+      const  {user: {token}}  = response.data;
+      console.log('El token es:',token);
+      // Guarda el token en el almacenamiento local (localStorage)
+      // Es una práctica común, pero considera otras opciones como httpOnly cookies para mayor seguridad
+      localStorage.setItem('jwtToken', token);
+
       setSuccess(response.data.message || 'Inicio de sesión exitoso');
      
       setFormData({ usuario: '', password: '' }); // Limpia el formulario
-      setTimeout(() => {
+      /* setTimeout(() => {
          history.push('/');
-      }, 2000);
+      }, 2000); */
     } catch (err) {
       setError(err.response?.data?.error || 'Error al iniciar sesión');
     }

@@ -21,12 +21,10 @@ function App() {
   return (
     <AuthProvider>
     <CartProvider>
-    <div className='App'>
-        
-        <NavB/>
-      
+    <div className='App'> 
         <Router>
-          <Switch>   
+          <NavB/>
+          <Switch> 
             <Route path="/" exact component={Principal} />
             <Route path="/ProductosCRUD" component={ProductosCRUD} />
             <Route path="/Productos" component={Productos} />

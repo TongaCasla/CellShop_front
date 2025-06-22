@@ -4,6 +4,7 @@ import { Table, Button, Modal, Form, Spinner, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { ApiAgregarPres, ApiCategoria, ApiProducto, ApiTipoProducto } from '../Utilidades/api';
 
+
 const ProductosCRUD = () => {
   
   const [productos, setProductos] = useState([]);
@@ -23,7 +24,12 @@ const ProductosCRUD = () => {
     id_producto: '', 
   });
   
- 
+ const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+      },
+  };
+
   const [nuevoProducto, setNuevoProducto] = useState({
     nombre_producto: '',
     id_categoria: '',
@@ -74,7 +80,8 @@ const ProductosCRUD = () => {
     return;
     }
     try {
-      const response = await axios.post(`${ApiAgregarPres}${nuevaPres.id_producto}/presentacion`, nuevaPres);
+      
+      const response = await axios.post(`${ApiAgregarPres}${nuevaPres.id_producto}/presentacion`, nuevaPres,config);
       
       setNuevaPres({
         nombre_presentacion: '',
@@ -104,7 +111,7 @@ const ProductosCRUD = () => {
     return;
     }
     try {
-      const response = await axios.put(`${ApiAgregarPres}${id_producto}/presentacion/${id_presentacion}`,nuevaPres);
+      const response = await axios.put(`${ApiAgregarPres}${id_producto}/presentacion/${id_presentacion}`,nuevaPres,config);
       
       setNuevaPres({
         id_presentacion: '',
@@ -134,7 +141,7 @@ const ProductosCRUD = () => {
         return;
     }
     try {
-      const response = await axios.post(ApiTipoProducto,nuevoProducto);
+      const response = await axios.post(ApiTipoProducto,nuevoProducto,config);
       console.log(response);
       if(response){
          await fetchProductos();
@@ -414,7 +421,7 @@ const ProductosCRUD = () => {
 
   const eliminarPresentacion = async (id_presentacion,id_producto) => {
     try {
-      await axios.delete(`${ApiAgregarPres}${id_producto}/presentacion/${id_presentacion}`);
+      await axios.delete(`${ApiAgregarPres}${id_producto}/presentacion/${id_presentacion}`,config);
       await fetchProductos();
       handleClose();
     } catch (error) {

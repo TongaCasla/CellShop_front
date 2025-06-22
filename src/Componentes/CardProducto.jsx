@@ -17,6 +17,11 @@ const CardProducto = ({ producto }) => {
   });
   const [errorMensaje, setErrorMensaje] = useState('');
 
+  const config = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+      },
+  };
   const agregarProductoCarrito = async () => {
     // Prepare the new product data
     const newProducto = {
@@ -30,7 +35,7 @@ const CardProducto = ({ producto }) => {
     // Update state and make API call
     try {
       setProductoCarrito(newProducto); // Update state for UI consistency
-      const response = await axios.post(`${ApiCarrito}agregar`, newProducto); // Use newProducto directly
+      const response = await axios.post(`${ApiCarrito}agregar`, newProducto,config); // Use newProducto directly
       console.log('Producto agregado:', response.data); // Log success for debugging
 
       // Reset state after success
