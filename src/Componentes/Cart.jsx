@@ -9,7 +9,7 @@ import { Modal } from 'react-bootstrap';
 
 const Cart = () => {
   const [carrito, setProductos] = useState([]);
-  const [error, setError] = useState(null);
+  const [errorMensaje, setError] = useState('');
   const { usuarioData } = useContext(AuthContext);
   const [successMessage, setSuccessMessage] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -53,7 +53,7 @@ const Cart = () => {
 
     try {
      
-      await axios.post(ApiVenta,metodo_pago,config);
+      const response = await axios.post(ApiVenta,metodo_pago,config);
       setSuccessMessage('Gracias por su compra :)');
       setShowModal(true); // Mostrar modal
       setTimeout(() => {
@@ -63,11 +63,14 @@ const Cart = () => {
       
     } catch (error) {
       console.error('Error al realizar la compra del carrito:', error.response?.status, error.response?.data || error.message);
-      if (error.response?.status === 401 || error.response?.status === 403) {
+      setError(error.response.data.message);
+  
+
+      /*if (error.response?.status === 401 || error.response?.status === 403) {
         setError('No autorizado. Por favor, inicia sesión de nuevo.');
       } else {
         setError('No se pudo realizar la compra. Intenta de nuevo.');
-      }
+      } */
     }
   };
   const handleRemoveItem = async (id_carrito_detalle) => {
@@ -97,7 +100,7 @@ const Cart = () => {
   return (
     <Container className="mt-4">
       <h2>Carrito de compras</h2>
-      {error && <p className="text-danger">{error}</p>}
+      {errorMensaje && <p className="text-danger">{errorMensaje}</p>}
       {successMessage && <p className="text-success">{successMessage}</p>}
       {carrito.length === 0 ? (
         <p>El carrito está vacío.</p>

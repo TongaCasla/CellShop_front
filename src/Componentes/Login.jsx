@@ -38,9 +38,9 @@ const Login = () => {
       setSuccess(response.data.message || 'Inicio de sesión exitoso');
      
       setFormData({ usuario: '', password: '' }); // Limpia el formulario
-      /* setTimeout(() => {
+      setTimeout(() => {
          history.push('/');
-      }, 2000); */
+      }, 2000); 
     } catch (err) {
       setError(err.response?.data?.error || 'Error al iniciar sesión');
     }
