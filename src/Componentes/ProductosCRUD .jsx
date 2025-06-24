@@ -13,6 +13,7 @@ const ProductosCRUD = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [formTipo, setFormTipo] = useState("");
+  const [mensajeExito, setMensajeExito] = useState("");
   const [nuevaPres, setNuevaPres] = useState({
 
     
@@ -68,7 +69,11 @@ const ProductosCRUD = () => {
     setFormTipo("modificar");
     setShowModal(true);
   };
-  const handleClose = () => setShowModal(false);
+  const handleClose = () => {
+  setMensajeExito('');
+  setErrorMensaje('');
+  setShowModal(false);
+  };
 
    const [errorMensaje, setErrorMensaje] = useState('');
 
@@ -91,9 +96,12 @@ const ProductosCRUD = () => {
         porcentaje_aumento: '',
         id_producto: '',
       }); 
-      setErrorMensaje('');
-      await fetchProductos();
-      handleClose();
+      setMensajeExito('Presentación agregada');
+       await fetchProductos();
+       setTimeout(() => {
+       handleClose();
+      }, 3000);
+        
     } catch (error) {
       console.error('Error al agregar producto:', error);
       setErrorMensaje(error.response.data.message);
@@ -241,6 +249,7 @@ const ProductosCRUD = () => {
                 Agregar
                </Button>
                {errorMensaje && (<Alert variant="danger">{errorMensaje}</Alert>)}
+              
           </Form.Group>
           </Form>
       ),
@@ -318,6 +327,7 @@ const ProductosCRUD = () => {
                 Agregar
                </Button>
                {errorMensaje && (<Alert variant="danger">{errorMensaje}</Alert>)}
+              {mensajeExito && (<Alert variant="success">{mensajeExito}</Alert>)}
           </Form.Group>
           </Form>
       ),
@@ -438,13 +448,24 @@ const ProductosCRUD = () => {
       'porcentaje_aumento',
       'id_producto'
     ];
-
+    
     for (let campo of camposObligatorios) {
       if (!nuevaPres[campo] || nuevaPres[campo].toString().trim() === "") {
           return `El campo "${campo.replace('_', ' ')}" es obligatorio.`;
       }
     }
-
+    // Validar que precio_compra, porcentaje_aumento y stock sean mayores a 0
+    if (parseFloat(nuevaPres.precio_compra) <= 0) {
+        return "El precio de compra debe ser mayor a 0.";
+    }
+    
+    if (parseFloat(nuevaPres.porcentaje_aumento) < 0) {
+        return "El porcentaje de aumento debe ser mayor a 0.";
+    }
+    
+    if (parseInt(nuevaPres.stock) < 0) {
+        return "El stock debe ser mayor a 0.";
+    }
     return null; // sin errores
   };
 
